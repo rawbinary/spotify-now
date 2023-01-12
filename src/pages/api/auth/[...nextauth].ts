@@ -1,4 +1,5 @@
 import NextAuth, { type NextAuthOptions } from "next-auth";
+import type { SpotifyProfile } from "next-auth/providers/spotify";
 import SpotifyProvider from "next-auth/providers/spotify";
 
 // Prisma adapter for NextAuth, optional and can be removed
@@ -6,6 +7,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 import { env } from "../../../env/server.mjs";
 import { prisma } from "../../../server/db";
+import type { OAuthUserConfig } from "next-auth/providers/oauth.js";
 
 export const authOptions: NextAuthOptions = {
   // Include user.id on session
@@ -20,9 +22,11 @@ export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
   adapter: PrismaAdapter(prisma),
   providers: [
-    SpotifyProvider({
+    CustomSpotifyProvider({
       clientId: env.SPOTIFY_CLIENT_ID,
       clientSecret: env.SPOTIFY_CLIENT_SECRET,
+      authorization:
+        "https://accounts.spotify.com/authorize?scope=user-read-email,user-read-currently-playing",
     }),
     /**
      * ...add more providers here
@@ -35,5 +39,9 @@ export const authOptions: NextAuthOptions = {
      */
   ],
 };
+
+function CustomSpotifyProvider(options: OAuthUserConfig<SpotifyProfile>) {
+  return Object.assign(SpotifyProvider(options), options);
+}
 
 export default NextAuth(authOptions);
