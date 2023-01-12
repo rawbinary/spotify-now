@@ -22,13 +22,14 @@ export const spotifyRouter = createTRPCRouter({
       }
     );
 
+    if (resp.status == 204) return "Nothing";
+
     const trackInfo = (await resp.json()) as SpotifyCurrentlyPlayingTrack;
-    console.log(trackInfo);
     return `${trackInfo.item.name} by ${
       trackInfo.item.artists[0]
         ? trackInfo.item.artists[0].name
         : "Not artist available."
-    }`;
+    } ${!trackInfo.is_playing ? "[paused]" : ""}`;
   }),
 });
 
