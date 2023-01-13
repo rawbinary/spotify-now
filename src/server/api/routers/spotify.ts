@@ -4,14 +4,9 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const spotifyRouter = createTRPCRouter({
   getCurrentSong: protectedProcedure.query(async ({ ctx }) => {
-    const accounts = await ctx.prisma.user
-      .findUnique({
-        where: { id: ctx.session.user.id },
-      })
-      .accounts();
-    const token = accounts?.pop()?.access_token;
+    const token = ctx.session.user.accessToken;
 
-    if (!token) return "Token Expired re-login.";
+    if (!token) return "No Access Token, relogin.";
 
     const resp = await fetch(
       "https://api.spotify.com/v1/me/player/currently-playing",
@@ -25,7 +20,7 @@ export const spotifyRouter = createTRPCRouter({
     if (resp.status == 204) return "Nothing";
 
     if (resp.status == 401) {
-      return 'Access Token Expired!'
+      return "Access Token Expired!";
     }
 
     const trackInfo = (await resp.json()) as SpotifyCurrentlyPlayingTrack;
