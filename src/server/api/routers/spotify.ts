@@ -24,6 +24,10 @@ export const spotifyRouter = createTRPCRouter({
 
     if (resp.status == 204) return "Nothing";
 
+    if (resp.status == 401) {
+      return 'Access Token Expired!'
+    }
+
     const trackInfo = (await resp.json()) as SpotifyCurrentlyPlayingTrack;
     return `${trackInfo.item.name} by ${
       trackInfo.item.artists[0]
