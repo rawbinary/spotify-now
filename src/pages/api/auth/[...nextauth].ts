@@ -75,7 +75,6 @@ export const authOptions: NextAuthOptions = {
         params: { scope: "user-read-email,user-read-currently-playing" },
       },
       profile(profile: SpotifyProfile) {
-        console.log(profile);
         return {
           id: profile.id,
           name: profile.display_name,
