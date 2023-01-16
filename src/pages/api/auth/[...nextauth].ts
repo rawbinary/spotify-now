@@ -16,14 +16,14 @@ export const authOptions: NextAuthOptions = {
         where: { userId: user.id, provider: "spotify" },
       });
 
-      if (spotify && spotify.expires_at && spotify.expires_at >= Date.now()) {
+      if (spotify && spotify.expires_at && spotify.expires_at <= Math.ceil(Date.now() / 1000)) {
         // token expired; trying to refresh it
         try {
           const resp = await fetch("https://accounts.spotify.com/api/token", {
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({
-              client_id: process.env.GOOGLE_ID,
-              client_secret: process.env.GOOGLE_SECRET,
+              client_id: env.SPOTIFY_CLIENT_ID,
+              client_secret: env.SPOTIFY_CLIENT_SECRET,
               grant_type: "refresh_token",
               refresh_token: spotify.refresh_token,
             } as Record<string, string>),
@@ -47,7 +47,7 @@ export const authOptions: NextAuthOptions = {
             },
             data: {
               access_token: tokens.access_token,
-              expires_at: Date.now() + tokens.expires_in,
+              expires_at: Math.ceil(Date.now() / 1000) + tokens.expires_in,
               refresh_token: tokens.refresh_token,
             },
           });
