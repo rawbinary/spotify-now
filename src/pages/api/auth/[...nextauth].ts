@@ -1,6 +1,7 @@
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import type { SpotifyProfile } from "next-auth/providers/spotify";
 import SpotifyProvider from "next-auth/providers/spotify";
+import GoogleProvider from "next-auth/providers/google";
 
 // Prisma adapter for NextAuth, optional and can be removed
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
@@ -16,7 +17,11 @@ export const authOptions: NextAuthOptions = {
         where: { userId: user.id, provider: "spotify" },
       });
 
-      if (spotify && spotify.expires_at && spotify.expires_at <= Math.ceil(Date.now() / 1000)) {
+      if (
+        spotify &&
+        spotify.expires_at &&
+        spotify.expires_at <= Math.ceil(Date.now() / 1000)
+      ) {
         // token expired; trying to refresh it
         try {
           const resp = await fetch("https://accounts.spotify.com/api/token", {
@@ -68,6 +73,10 @@ export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
   adapter: PrismaAdapter(prisma),
   providers: [
+    GoogleProvider({
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+    }),
     SpotifyProvider({
       clientId: env.SPOTIFY_CLIENT_ID,
       clientSecret: env.SPOTIFY_CLIENT_SECRET,
