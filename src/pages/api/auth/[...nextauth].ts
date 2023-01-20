@@ -77,21 +77,22 @@ export const authOptions: NextAuthOptions = {
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     }),
-    SpotifyProvider({
-      clientId: env.SPOTIFY_CLIENT_ID,
-      clientSecret: env.SPOTIFY_CLIENT_SECRET,
-      authorization: {
-        params: { scope: "user-read-email,user-read-currently-playing" },
-      },
-      profile(profile: SpotifyProfile) {
-        return {
-          id: profile.id,
-          name: profile.display_name,
-          email: profile.email,
-          image: profile.images?.[0]?.url,
-        };
-      },
-    }),
+    // SpotifyProvider({
+    //   clientId: env.SPOTIFY_CLIENT_ID,
+    //   clientSecret: env.SPOTIFY_CLIENT_SECRET,
+    //   authorization: {
+    //     params: { scope: "user-read-email,user-read-currently-playing" },
+    //   },
+    //   profile(profile: SpotifyProfile) {
+    //     return {
+    //       id: profile.id,
+    //       name: profile.display_name,
+    //       email: profile.email,
+    //       image: profile.images?.[0]?.url,
+    //     };
+    //   },
+    // }),
+    
     /**
      * ...add more providers here
      *
