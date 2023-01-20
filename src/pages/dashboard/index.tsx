@@ -1,4 +1,4 @@
-import { NextPage } from "next";
+import type { NextPage } from "next";
 
 const Dashboard: NextPage = () => {
     return <>This is Dashboard</>
