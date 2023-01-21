@@ -1,6 +1,6 @@
 import NextAuth, { type NextAuthOptions } from "next-auth";
-import type { SpotifyProfile } from "next-auth/providers/spotify";
-import SpotifyProvider from "next-auth/providers/spotify";
+// import type { SpotifyProfile } from "next-auth/providers/spotify";
+// import SpotifyProvider from "next-auth/providers/spotify";
 import GoogleProvider from "next-auth/providers/google";
 
 // Prisma adapter for NextAuth, optional and can be removed
