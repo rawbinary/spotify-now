@@ -8,7 +8,20 @@ import DashboardLayout from "../../layout/dashboard";
 import { getServerAuthSession } from "../../server/auth";
 
 const Dashboard: NextPage = () => {
-  return <DashboardLayout>This is Dashboard</DashboardLayout>;
+  return (
+    <DashboardLayout>
+      <main className="flex flex-col items-center justify-center pt-10 transition-all duration-100">
+        <div className="flex flex-col items-center justify-center gap-6 rounded-lg border border-zinc-800 p-4 hover:shadow-lg">
+          <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[2rem]">
+            Now Playing
+          </h1>
+          <h3 className="text-2xl text-white">
+            Sign In to show your currently playing song on spotify
+          </h3>
+        </div>
+      </main>
+    </DashboardLayout>
+  );
 };
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -24,6 +37,9 @@ export const getServerSideProps: GetServerSideProps = async (
       },
     };
   }
+
+  // Check if whitelisted on Spotify
+  // If not, whitelist request flow
 
   return {
     props: { session },
