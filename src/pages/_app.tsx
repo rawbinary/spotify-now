@@ -6,14 +6,20 @@ import { api } from "../utils/api";
 
 import "../styles/globals.css";
 
+// Progressbar
+import NextNProgress from "nextjs-progressbar";
+
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
   return (
-    <SessionProvider session={session}>
-      <Component {...pageProps} />
-    </SessionProvider>
+    <>
+      <NextNProgress stopDelayMs={200} height={3} showOnShallow={true} />
+      <SessionProvider session={session}>
+        <Component {...pageProps} />
+      </SessionProvider>
+    </>
   );
 };
 
