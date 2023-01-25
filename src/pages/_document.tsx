@@ -5,7 +5,7 @@ export default class Document extends NextDocument {
     return (
       <Html lang="en">
         <Head />
-        <body className="min-h-screen bg-gradient-to-b from-[#2e026d] to-[#15162c] font-sans text-white">
+        <body className="min-h-screen bg-zinc-900 font-sans text-white">
           <Main />
           <NextScript />
         </body>

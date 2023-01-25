@@ -8,7 +8,7 @@ import DashboardLayout from "../../layout/dashboard";
 import { getServerAuthSession } from "../../server/auth";
 
 const Dashboard: NextPage = () => {
-  return <>This is Dashboard</>;
+  return <DashboardLayout>This is Dashboard</DashboardLayout>;
 };
 
 export const getServerSideProps: GetServerSideProps = async (
