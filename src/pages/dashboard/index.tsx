@@ -1,14 +1,33 @@
-import type { NextPage } from "next";
-import { useSession } from "next-auth/react";
-import AccessDenied from "../../components/AccessDenied";
+import type {
+  GetServerSideProps,
+  GetServerSidePropsContext,
+  NextPage,
+} from "next";
+
+import DashboardLayout from "../../layout/dashboard";
+import { getServerAuthSession } from "../../server/auth";
 
 const Dashboard: NextPage = () => {
-    const { data: session } = useSession()
+  return <>This is Dashboard</>;
+};
 
-    if (!session) {
-        return <AccessDenied/>
-    }
-    return <>This is Dashboard</>
-}
+export const getServerSideProps: GetServerSideProps = async (
+  ctx: GetServerSidePropsContext
+) => {
+  const session = await getServerAuthSession(ctx);
 
-export default Dashboard
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/api/auth/signin",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: { session },
+  };
+};
+
+export default Dashboard;
