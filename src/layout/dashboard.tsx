@@ -10,9 +10,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           <h1 className="text-2xl">Dashboard</h1>
         </div>
       </div>
-      <div className="container mx-auto pl-4 pr-4 md:pl-0 md:pr-0">
-        {children}
-      </div>
+      {children}
     </main>
   );
 };
