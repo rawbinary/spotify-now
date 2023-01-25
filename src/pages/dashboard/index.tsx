@@ -38,8 +38,27 @@ export const getServerSideProps: GetServerSideProps = async (
     };
   }
 
-  // Check if whitelisted on Spotify
-  // If not, whitelist request flow
+  const user = await prisma?.user.findUnique({
+    where: { id: session.user?.id },
+  });
+
+  if (!user) {
+    return {
+      redirect: {
+        destination: "/api/auth/signin",
+        permanent: false,
+      },
+    };
+  }
+
+  if (user.activated !== true) {
+    return {
+      redirect: {
+        destination: "/activation",
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: { session },
