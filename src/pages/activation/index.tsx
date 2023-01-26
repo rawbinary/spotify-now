@@ -7,7 +7,6 @@ import type {
 import { getServerAuthSession } from "../../server/auth";
 import type { Session } from "next-auth";
 import { useSession } from "next-auth/react";
-import { prisma } from "../../server/db";
 
 type Props = {
   session: Session;
@@ -47,6 +46,7 @@ const Activation: NextPage = () => {
   );
 };
 
+import { prisma as db } from "../../server/db";
 export const getServerSideProps: GetServerSideProps<Props> = async (
   ctx: GetServerSidePropsContext
 ) => {
@@ -61,7 +61,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
     };
   }
 
-  const user = await prisma.user.findFirst({
+  const user = await db.user.findFirst({
     where: { id: session.user?.id },
   });
 
