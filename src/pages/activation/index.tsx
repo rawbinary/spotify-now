@@ -46,13 +46,12 @@ const Activation: NextPage = () => {
   );
 };
 
-import { prisma as db } from "../../server/db";
 export const getServerSideProps: GetServerSideProps<Props> = async (
   ctx: GetServerSidePropsContext
 ) => {
   const session = await getServerAuthSession(ctx);
 
-  if (!session) {
+  if (!session || !session.user) {
     return {
       redirect: {
         destination: "/api/auth/signin",
@@ -61,20 +60,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
     };
   }
 
-  const user = await db.user.findFirst({
-    where: { id: session.user?.id },
-  });
-
-  if (!user) {
-    return {
-      redirect: {
-        destination: "/api/auth/signin",
-        permanent: false,
-      },
-    };
-  }
-
-  if (user.activated === true) {
+  if (session.user.activated === true) {
     return {
       redirect: {
         destination: "/dashboard",

@@ -12,7 +12,7 @@ import { prisma } from "../../../server/db";
 export const authOptions: NextAuthOptions = {
   // Include user.id on session
   callbacks: {
-    session({ session, user }) {
+    async session({ session, user }) {
       // const [spotify] = await prisma.account.findMany({
       //   where: { userId: user.id, provider: "spotify" },
       // });
@@ -64,6 +64,11 @@ export const authOptions: NextAuthOptions = {
 
       if (session.user) {
         session.user.id = user.id;
+        const userobj = await prisma.user.findFirst({
+          where: { id: session.user.id },
+        });
+        session.user.activated = userobj?.activated;
+
         // session.user.accessToken = spotify?.access_token;
       }
 
@@ -92,7 +97,7 @@ export const authOptions: NextAuthOptions = {
     //     };
     //   },
     // }),
-    
+
     /**
      * ...add more providers here
      *

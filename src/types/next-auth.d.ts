@@ -9,6 +9,7 @@ declare module "next-auth" {
       id: string;
       accessToken?: string | null;
       songId?: string;
+      activated?: boolean;
     } & DefaultSession["user"];
     error?: string;
   }
