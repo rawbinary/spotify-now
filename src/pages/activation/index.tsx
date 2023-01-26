@@ -5,16 +5,10 @@ import type {
 } from "next";
 
 import { getServerAuthSession } from "../../server/auth";
-import type { Session } from "next-auth";
 import { useSession } from "next-auth/react";
-
-type Props = {
-  session: Session;
-};
 
 const Activation: NextPage = () => {
   const session = useSession();
-  console.log();
   return (
     <main className="mt-10 transition-all duration-100">
       <div className="mt-1 border-b-2 border-zinc-800">
@@ -46,7 +40,7 @@ const Activation: NextPage = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async (
+export const getServerSideProps: GetServerSideProps = async (
   ctx: GetServerSidePropsContext
 ) => {
   const session = await getServerAuthSession(ctx);
