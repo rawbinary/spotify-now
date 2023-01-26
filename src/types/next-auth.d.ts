@@ -10,6 +10,7 @@ declare module "next-auth" {
       accessToken?: string | null;
       songId?: string;
       activated?: boolean;
+      spotify?: boolean;
     } & DefaultSession["user"];
     error?: string;
   }

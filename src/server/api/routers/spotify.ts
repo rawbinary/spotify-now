@@ -26,11 +26,23 @@ export const spotifyRouter = createTRPCRouter({
     if (resp.status == 403) return await resp.text();
 
     const trackInfo = (await resp.json()) as SpotifyCurrentlyPlayingTrack;
-    return `${trackInfo.item.name} by ${
-      trackInfo.item.artists[0]
-        ? trackInfo.item.artists[0].name
-        : "Not artist available."
-    } ${!trackInfo.is_playing ? "[paused]" : ""}`;
+    return `${trackInfo.item.name} by ${trackInfo.item.artists
+      .map((x) => x.name)
+      .join(", ")} ${!trackInfo.is_playing ? "[paused]" : ""}`;
+  }),
+
+  getCurrentUser: protectedProcedure.query(async ({ ctx }) => {
+    console.log(ctx.session.user.accessToken);
+
+    const [spotify] = await ctx.prisma.account.findMany({
+      where: { userId: ctx.session.user.id, provider: "spotify" },
+    });
+
+    if (!spotify) {
+      return undefined;
+    }
+
+    return spotify.userId;
   }),
 });
 
