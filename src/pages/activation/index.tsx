@@ -5,8 +5,16 @@ import type {
 } from "next";
 
 import { getServerAuthSession } from "../../server/auth";
+import type { Session } from "next-auth";
+import { useSession } from "next-auth/react";
+
+type Props = {
+  session: Session;
+};
 
 const Activation: NextPage = () => {
+  const session = useSession();
+  console.log();
   return (
     <main className="mt-10 transition-all duration-100">
       <div className="mt-1 border-b-2 border-zinc-800">
@@ -20,27 +28,25 @@ const Activation: NextPage = () => {
             Spotify Whitelist
           </h1>
           <h3 className="text-2xl text-white">
-            You need to be whitelisted to use the app.
+            You are not yet whitelisted to use the app.
           </h3>
+          <span>Please wait until you&apos;re whitelisted. </span>
           <span>
-            Please enter your email address associated with your Spotify
-            account.
+            Also, make sure that your spotify account has following email.
           </span>
           <input
             type="text"
-            placeholder="abc@example.com"
+            readOnly
+            value={session.data?.user?.email || "Not available"}
             className="mt-1 w-full rounded-md bg-zinc-700 px-4 py-2 text-white focus:border-none"
           />
-          <button className="w-[10rem] rounded-md bg-zinc-800 px-2 py-2 outline-none duration-200 ease-in-out hover:text-gray-300 hover:transition focus:ring-1 focus:ring-gray-500 focus:ring-offset-1 focus:ring-offset-stone-800">
-            Request
-          </button>
         </div>
       </div>
     </main>
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (
+export const getServerSideProps: GetServerSideProps<Props> = async (
   ctx: GetServerSidePropsContext
 ) => {
   const session = await getServerAuthSession(ctx);
