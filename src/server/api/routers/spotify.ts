@@ -1,42 +1,51 @@
 import { z } from "zod";
 
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { env } from "../../../env/server.mjs";
 
 export const spotifyRouter = createTRPCRouter({
   getCurrentSong: protectedProcedure.query(async ({ ctx }) => {
-    const token = ctx.session.user.accessToken;
+    if (!ctx.session.user.accessToken) return "No Access Token, relogin.";
+    return await getFromSpotify(ctx.session.user.accessToken);
+  }),
 
-    if (!token) return "No Access Token, relogin.";
+  getStreamLink: protectedProcedure.query(async ({ ctx }) => {
+    let [link] = await ctx.prisma.spotifyLink.findMany({
+      where: { userId: ctx.session.user.id },
+    });
 
-    const resp = await fetch(
-      "https://api.spotify.com/v1/me/player/currently-playing",
-      {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      }
-    );
-
-    if (resp.status == 204) return "Nothing";
-
-    if (resp.status == 401) {
-      return "Access Token Expired!";
+    if (!link) {
+      link = await ctx.prisma.spotifyLink.create({
+        data: { userId: ctx.session.user.id },
+      });
     }
 
-    if (resp.status == 403) return await resp.text();
-
-    const trackInfo = (await resp.json()) as SpotifyCurrentlyPlayingTrack;
-    return `${trackInfo.item.name} by ${trackInfo.item.artists
-      .map((x) => x.name)
-      .join(", ")} ${!trackInfo.is_playing ? "[paused]" : ""}`;
+    return `${env.NEXTAUTH_URL}/source/${link.id}`;
   }),
 
-  getStreamLink: protectedProcedure.query(({ ctx }) => {
-    // await ctx.prisma.spotifyLink;
+  getSongByID: publicProcedure
+    .input(z.object({ lid: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const spotifyAccs = await ctx.prisma.spotifyLink
+        .findFirst({
+          where: { id: input.lid },
+        })
+        .user()
+        .accounts({ where: { provider: "spotify" } });
 
-    return `${env.NEXTAUTH_URL}/api/`;
-  }),
+      if (!spotifyAccs) {
+        throw "Invalid Link";
+      }
+
+      const acc = spotifyAccs.pop();
+
+      if (!acc) {
+        throw "Invalid Link";
+      }
+
+      if (!acc.access_token) return "No Access Token, relogin.";
+      return getFromSpotify(acc.access_token);
+    }),
 });
 
 const SpotifyCurrentlyPlayingTrack = z.object({
@@ -50,3 +59,27 @@ const SpotifyCurrentlyPlayingTrack = z.object({
 type SpotifyCurrentlyPlayingTrack = z.infer<
   typeof SpotifyCurrentlyPlayingTrack
 >;
+
+async function getFromSpotify(token: string) {
+  const resp = await fetch(
+    "https://api.spotify.com/v1/me/player/currently-playing",
+    {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    }
+  );
+
+  if (resp.status == 204) return "Nothing";
+
+  if (resp.status == 401) {
+    return "Access Token Expired!";
+  }
+
+  if (resp.status == 403) return await resp.text();
+
+  const trackInfo = (await resp.json()) as SpotifyCurrentlyPlayingTrack;
+  return `${trackInfo.item.name} by ${trackInfo.item.artists
+    .map((x) => x.name)
+    .join(", ")} ${!trackInfo.is_playing ? "[paused]" : ""}`;
+}
