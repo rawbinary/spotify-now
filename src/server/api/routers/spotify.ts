@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { env } from "../../../env/server.mjs";
 
 export const spotifyRouter = createTRPCRouter({
   getCurrentSong: protectedProcedure.query(async ({ ctx }) => {
@@ -31,18 +32,10 @@ export const spotifyRouter = createTRPCRouter({
       .join(", ")} ${!trackInfo.is_playing ? "[paused]" : ""}`;
   }),
 
-  getCurrentUser: protectedProcedure.query(async ({ ctx }) => {
-    console.log(ctx.session.user.accessToken);
+  getStreamLink: protectedProcedure.query(({ ctx }) => {
+    // await ctx.prisma.spotifyLink;
 
-    const [spotify] = await ctx.prisma.account.findMany({
-      where: { userId: ctx.session.user.id, provider: "spotify" },
-    });
-
-    if (!spotify) {
-      return undefined;
-    }
-
-    return spotify.userId;
+    return `${env.NEXTAUTH_URL}/api/`;
   }),
 });
 
